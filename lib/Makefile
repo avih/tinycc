@@ -34,6 +34,8 @@ ifndef TARGET # native library
  endif
 endif
 
+$(info ---- [ libtcc1.a - TARGET: ${TARGET}])
+
 BCHECK_O = bcheck.o
 DIR = $(TARGET)
 
