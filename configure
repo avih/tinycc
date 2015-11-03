@@ -57,7 +57,7 @@ esac
 # OS specific
 targetos=`uname`
 case $targetos in
-  MINGW32*)  mingw32=yes; host_os=Windows; ;;
+  MINGW32*)  mingw32=yes; targetos=Windows; ;;
   DragonFly) noldl=yes;;
   OpenBSD)   noldl=yes;;
   FreeBSD)   noldl=yes;;
