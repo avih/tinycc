@@ -89,17 +89,23 @@ $(ARM_FPA_LD_CROSS)_LINK = arm-fpa-ld-tcc$(EXESUF)
 $(ARM_VFP_CROSS)_LINK = arm-vfp-tcc$(EXESUF)
 $(ARM_EABI_CROSS)_LINK = arm-eabi-tcc$(EXESUF)
 
+ifeq ($(CONFIG_CROSS),Yes)
 ifeq ($(TARGETOS),Windows)
 ifeq ($(ARCH),i386)
 PROGS:=$($(WIN32_CROSS)_LINK)
 $($(WIN32_CROSS)_LINK)_TCC = yes
+YES_THINGY=$($(WIN32_CROSS)_LINK)_TCC
 endif
 ifeq ($(ARCH),x86-64)
 PROGS:=$($(WIN64_CROSS)_LINK)
 $($(WIN64_CROSS)_LINK)_TCC = yes
+YES_THINGY=$($(WIN64_CROSS)_LINK)_TCC
+endif
 endif
 endif
 
+# should probably uncomment this enclosing if - same as on windows, but untested.
+#ifeq ($(CONFIG_CROSS),Yes)
 ifeq ($(TARGETOS),Linux)
 ifeq ($(ARCH),i386)
 PROGS:=$($(I386_CROSS)_LINK)
@@ -110,6 +116,7 @@ PROGS:=$($(X64_CROSS)_LINK)
 $($(X64_CROSS)_LINK)_TCC = yes
 endif
 endif
+#endif
 
 CORE_FILES = tcc.c libtcc.c tccpp.c tccgen.c tccelf.c tccasm.c tccrun.c
 CORE_FILES += tcc.h config.h libtcc.h tcctok.h
@@ -125,14 +132,15 @@ C67_FILES = $(CORE_FILES) c67-gen.c tcccoff.c
 ifdef CONFIG_WIN64
 PROGS+=tiny_impdef$(EXESUF) tiny_libmaker$(EXESUF)
 NATIVE_FILES=$(WIN64_FILES)
+# should probably add $(WIN64_CROSS) and lib/x86_64-win/libtcc1.a like for WIN32, but untested.
 PROGS_CROSS=$(WIN32_CROSS) $(I386_CROSS) $(X64_CROSS) $(ARM_CROSS) $(ARM64_CROSS) $(C67_CROSS) $(WINCE_CROSS)
 LIBTCC1_CROSS=lib/i386-win/libtcc1.a
 LIBTCC1=libtcc1.a
 else ifdef CONFIG_WIN32
 PROGS+=tiny_impdef$(EXESUF) tiny_libmaker$(EXESUF)
 NATIVE_FILES=$(WIN32_FILES)
-PROGS_CROSS=$(WIN64_CROSS) $(I386_CROSS) $(X64_CROSS) $(ARM_CROSS) $(ARM64_CROSS) $(C67_CROSS) $(WINCE_CROSS)
-LIBTCC1_CROSS=lib/x86_64-win/libtcc1.a
+PROGS_CROSS=$(WIN32_CROSS) $(WIN64_CROSS) $(I386_CROSS) $(X64_CROSS) $(ARM_CROSS) $(ARM64_CROSS) $(C67_CROSS) $(WINCE_CROSS)
+LIBTCC1_CROSS=lib/i386-win/libtcc1.a lib/x86_64-win/libtcc1.a
 LIBTCC1=libtcc1.a
 else ifeq ($(ARCH),i386)
 NATIVE_FILES=$(I386_FILES)
@@ -173,6 +181,18 @@ endif
 TCCLIBS = $(LIBTCC1) $(LIBTCC) $(LIBTCC_EXTRA)
 TCCDOCS = tcc.1 tcc-doc.html tcc-doc.info
 
+$(info ---- $$PROGS         is [${PROGS}])
+$(info ---- $$YES_THINGY    is [${YES_THINGY}])
+$(info ---- $$NATIVE_FILES  is [${NATIVE_FILES}])
+$(info ---- $$PROGS_CROSS   is [${PROGS_CROSS}])
+$(info ---- $$LIBTCC1_CROSS is [${LIBTCC1_CROSS}])
+$(info ---- $$LIBTCC1       is [${LIBTCC1}])
+$(info ---- $$LIBTCC        is [${LIBTCC}])
+$(info ---- $$LIBTCC_DLL    is [${LIBTCC_DLL}])
+$(info ---- $$LIBTCC_EXTRA  is [${LIBTCC_EXTRA}])
+$(info ---- $$TCCLIBS       is [${TCCLIBS}])
+$(info ---- $$TCCDOCS       is [${TCCDOCS}])
+
 ifdef CONFIG_CROSS
 PROGS+=$(PROGS_CROSS)
 TCCLIBS+=$(LIBTCC1_CROSS)
@@ -182,16 +202,19 @@ all: $(PROGS) $(TCCLIBS) $(TCCDOCS)
 
 # Host Tiny C Compiler
 tcc$(EXESUF): tcc.o $(LIBTCC)
+	$(info ---- [making host tcc: tcc$(EXESUF)])
 	$(CC) -o $@ $^ $(LIBS) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LINK_LIBTCC)
 
 # Cross Tiny C Compilers
 %-tcc$(EXESUF): tcc.c
+	$(info ---- [making cross tcc: $@])
 	$(CC) -o $@ $< -DONE_SOURCE $(if $($@_TCC),$(NATIVE_DEFINES),$(DEFINES)) $(CPPFLAGS) $(CFLAGS) $(LIBS) $(LDFLAGS)
 	$(if $($@_LINK),ln -sf $@ $($@_LINK))
 	$(if $($@_TCC),ln -sf $@ tcc$(EXESUF))
 
 # profiling version
 tcc_p$(EXESUF): $(NATIVE_FILES)
+	$(info ---- [making profiler: tcc_p$(EXESUF)])
 	$(CC) -o $@ $< -DONE_SOURCE $(NATIVE_DEFINES) $(CPPFLAGS_P) $(CFLAGS_P) $(LIBS_P) $(LDFLAGS_P)
 
 $(I386_CROSS) $($(I386_CROSS)_LINK): DEFINES = -DTCC_TARGET_I386
@@ -222,9 +245,11 @@ $(ARM64_CROSS): $(ARM64_FILES)
 
 # libtcc generation and test
 ifndef ONE_SOURCE
+$(info ---- [not ONE_SOURCE])
 LIBTCC_OBJ = $(filter-out tcc.o,$(patsubst %.c,%.o,$(filter %.c,$(NATIVE_FILES))))
 LIBTCC_INC = $(filter %.h,$(CORE_FILES)) $(filter-out $(CORE_FILES),$(NATIVE_FILES))
 else
+$(info ---- [yes ONE_SOURCE])
 LIBTCC_OBJ = libtcc.o
 LIBTCC_INC = $(NATIVE_FILES)
 libtcc.o : NATIVE_DEFINES += -DONE_SOURCE
@@ -260,6 +285,7 @@ libtcc1.a : FORCE $(PROGS)
 	if test ! -d $(ARCH); then mkdir $(ARCH); fi
 	if test ! -L $(ARCH)/$@; then ln -sf ../$@ $(ARCH)/$@; fi
 lib/%/libtcc1.a : FORCE $(PROGS_CROSS)
+	$(info ---- [making: $@])
 	$(MAKE) -C lib cross TARGET=$*
 
 FORCE:
@@ -378,7 +404,7 @@ export LIBTCC1
 
 clean:
 	rm -vf $(PROGS) tcc_p$(EXESUF) tcc.pod *~ *.o *.a *.so* *.out *.log \
-		*.exe a.out tags TAGS libtcc_test$(EXESUF) tcc$(EXESUF)
+		*.exe a.out tcc-doc.info tcc-doc.html tcc.1 tags TAGS libtcc_test$(EXESUF) tcc$(EXESUF)
 	-rm -r $(ARCH) arm64
 ifeq ($(HOST_OS),Linux)
 	-rm -r ./C:
