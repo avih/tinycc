@@ -1069,37 +1069,45 @@ struct TCCState {
  DEF(TOK_ASM_ ## f ## x ## p, "f" #x "p") \
  DEF_FP1(x)
 
-#define DEF_ASMTEST(x,suffix) \
- DEF_ASM(x ## o ## suffix) \
- DEF_ASM(x ## no ## suffix) \
- DEF_ASM(x ## b ## suffix) \
- DEF_ASM(x ## c ## suffix) \
- DEF_ASM(x ## nae ## suffix) \
- DEF_ASM(x ## nb ## suffix) \
- DEF_ASM(x ## nc ## suffix) \
- DEF_ASM(x ## ae ## suffix) \
- DEF_ASM(x ## e ## suffix) \
- DEF_ASM(x ## z ## suffix) \
- DEF_ASM(x ## ne ## suffix) \
- DEF_ASM(x ## nz ## suffix) \
- DEF_ASM(x ## be ## suffix) \
- DEF_ASM(x ## na ## suffix) \
- DEF_ASM(x ## nbe ## suffix) \
- DEF_ASM(x ## a ## suffix) \
- DEF_ASM(x ## s ## suffix) \
- DEF_ASM(x ## ns ## suffix) \
- DEF_ASM(x ## p ## suffix) \
- DEF_ASM(x ## pe ## suffix) \
- DEF_ASM(x ## np ## suffix) \
- DEF_ASM(x ## po ## suffix) \
- DEF_ASM(x ## l ## suffix) \
- DEF_ASM(x ## nge ## suffix) \
- DEF_ASM(x ## nl ## suffix) \
- DEF_ASM(x ## ge ## suffix) \
- DEF_ASM(x ## le ## suffix) \
- DEF_ASM(x ## ng ## suffix) \
- DEF_ASM(x ## nle ## suffix) \
- DEF_ASM(x ## g ## suffix)
+/* Note: while it would have been valid to define DEF_ASMTEST(x, suf) and then
+ * concatenate with suffix even if it's empty, tcc 0.9.26 (latest official release
+ * as of now) does not like it. For the sake of self hosting with 0.9.26, use
+ * this form instead.
+ * Note: This still produces warnings, but will build. And yet, it will not pass
+ * all tests (fails at the abi test). However, the resulting executable can then
+ * be then be used to build tcc again, now cleanly, and with all tests passing.
+ */
+#define DEF_ASMTEST(x, ...) \
+ DEF_ASM(x ## o ## __VA_ARGS__) \
+ DEF_ASM(x ## no ## __VA_ARGS__) \
+ DEF_ASM(x ## b ## __VA_ARGS__) \
+ DEF_ASM(x ## c ## __VA_ARGS__) \
+ DEF_ASM(x ## nae ## __VA_ARGS__) \
+ DEF_ASM(x ## nb ## __VA_ARGS__) \
+ DEF_ASM(x ## nc ## __VA_ARGS__) \
+ DEF_ASM(x ## ae ## __VA_ARGS__) \
+ DEF_ASM(x ## e ## __VA_ARGS__) \
+ DEF_ASM(x ## z ## __VA_ARGS__) \
+ DEF_ASM(x ## ne ## __VA_ARGS__) \
+ DEF_ASM(x ## nz ## __VA_ARGS__) \
+ DEF_ASM(x ## be ## __VA_ARGS__) \
+ DEF_ASM(x ## na ## __VA_ARGS__) \
+ DEF_ASM(x ## nbe ## __VA_ARGS__) \
+ DEF_ASM(x ## a ## __VA_ARGS__) \
+ DEF_ASM(x ## s ## __VA_ARGS__) \
+ DEF_ASM(x ## ns ## __VA_ARGS__) \
+ DEF_ASM(x ## p ## __VA_ARGS__) \
+ DEF_ASM(x ## pe ## __VA_ARGS__) \
+ DEF_ASM(x ## np ## __VA_ARGS__) \
+ DEF_ASM(x ## po ## __VA_ARGS__) \
+ DEF_ASM(x ## l ## __VA_ARGS__) \
+ DEF_ASM(x ## nge ## __VA_ARGS__) \
+ DEF_ASM(x ## nl ## __VA_ARGS__) \
+ DEF_ASM(x ## ge ## __VA_ARGS__) \
+ DEF_ASM(x ## le ## __VA_ARGS__) \
+ DEF_ASM(x ## ng ## __VA_ARGS__) \
+ DEF_ASM(x ## nle ## __VA_ARGS__) \
+ DEF_ASM(x ## g ## __VA_ARGS__)
 
 #endif /* defined TCC_TARGET_I386 || defined TCC_TARGET_X86_64 */
 
