@@ -24,6 +24,13 @@ ifdef CONFIG_WIN64
 CONFIG_WIN32=yes
 endif
 
+ifdef CONFIG_WIN32
+ifeq ($(ARCH),x86-64)
+$(info ---- [got CONFIG_WIN32 and x86-64, setting CONFIG_WIN64])
+CONFIG_WIN64=yes
+endif
+endif
+
 ifndef CONFIG_WIN32
 LIBS=-lm
 ifndef CONFIG_NOLDL
@@ -133,8 +140,8 @@ ifdef CONFIG_WIN64
 PROGS+=tiny_impdef$(EXESUF) tiny_libmaker$(EXESUF)
 NATIVE_FILES=$(WIN64_FILES)
 # should probably add $(WIN64_CROSS) and lib/x86_64-win/libtcc1.a like for WIN32, but untested.
-PROGS_CROSS=$(WIN32_CROSS) $(I386_CROSS) $(X64_CROSS) $(ARM_CROSS) $(ARM64_CROSS) $(C67_CROSS) $(WINCE_CROSS)
-LIBTCC1_CROSS=lib/i386-win/libtcc1.a
+PROGS_CROSS=$(WIN32_CROSS) $(WIN64_CROSS) $(I386_CROSS) $(X64_CROSS) $(ARM_CROSS) $(ARM64_CROSS) $(C67_CROSS) $(WINCE_CROSS)
+LIBTCC1_CROSS=lib/x86_64-win/libtcc1.a lib/i386-win/libtcc1.a
 LIBTCC1=libtcc1.a
 else ifdef CONFIG_WIN32
 PROGS+=tiny_impdef$(EXESUF) tiny_libmaker$(EXESUF)
