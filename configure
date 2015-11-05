@@ -608,10 +608,14 @@ fn_makelink()
 }
 
 if test "$source_path_used" = "yes" ; then
-  FILES="Makefile lib/Makefile tests/Makefile tests/tests2/Makefile"
+  FILES="Makefile lib/Makefile tests/Makefile tests/tests2/Makefile tests/pp/Makefile"
   for f in $FILES ; do
     fn_makelink $source_path $f
   done
+
+  # FIXME: tests2 and pp are unaware of custom dir, so just copy the test files too
+  cp $source_path/tests/tests2/* tests/tests2/
+  cp $source_path/tests/pp/*     tests/pp/
 fi
 
 # ---------------------------------------------------------------------------
