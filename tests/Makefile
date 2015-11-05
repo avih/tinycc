@@ -58,10 +58,10 @@ ifeq ($(TARGETOS),Darwin)
  NATIVE_DEFINES+=-D_ANSI_SOURCE
 endif
 
-# run local version of tcc with local libraries and includes
+# run local version of tcc with local libraries and includes. -I$(TOP) has config.h
 TCCFLAGS = -B$(TOP) -I$(TOP) -I$(top_srcdir) -I$(top_srcdir)/include -L$(TOP)
 ifdef CONFIG_WIN32
- TCCFLAGS = -B$(top_srcdir)/win32 -I$(top_srcdir) -I$(top_srcdir)/include -L$(TOP)
+ TCCFLAGS = -B$(top_srcdir)/win32 -I$(TOP) -I$(top_srcdir) -I$(top_srcdir)/include -L$(TOP)
 endif
 XTCCFLAGS = -B$(TOP) -B$(top_srcdir)/win32 -I$(TOP) -I$(top_srcdir) -I$(top_srcdir)/include
 
