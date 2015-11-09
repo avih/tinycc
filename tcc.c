@@ -59,6 +59,40 @@ static void display_info(TCCState *s, int what)
 #else
         " Linux"
 #endif
+#ifdef TCC_IS_NATIVE
+        " [native -"
+#else
+        " [cross from:"
+#endif
+
+#ifdef _WIN32
+        " win"
+#endif
+#ifdef __arm__
+        " arm"
+#endif
+#ifdef __aarch64__
+        " aarch64"
+#endif
+#ifdef __i386__
+        " i386"
+#endif
+#ifdef _X86_
+        " x86"
+#endif
+#ifdef __x86_64__
+        " x86_64"
+#endif
+#ifdef _AMD64_
+        " AMD64"
+#endif
+#ifdef CONFIG_TCC_ASM
+        " asm"
+#endif
+#ifdef CONFIG_TCC_BCHECK
+        " bcheck"
+#endif
+        "]"
         ")\n", TCC_VERSION);
         break;
     case 1:
