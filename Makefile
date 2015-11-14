@@ -96,30 +96,6 @@ $(ARM_FPA_LD_CROSS)_LINK = arm-fpa-ld-tcc$(EXESUF)
 $(ARM_VFP_CROSS)_LINK = arm-vfp-tcc$(EXESUF)
 $(ARM_EABI_CROSS)_LINK = arm-eabi-tcc$(EXESUF)
 
-ifeq ($(TARGETOS),Windows)
-ifeq ($(ARCH),i386)
-PROGS:=$($(WIN32_CROSS)_LINK) $(PROGS)
-$($(WIN32_CROSS)_LINK)_TCC = yes
-YES_THINGY=$($(WIN32_CROSS)_LINK)_TCC
-endif
-ifeq ($(ARCH),x86-64)
-PROGS:=$($(WIN64_CROSS)_LINK) $(PROGS)
-$($(WIN64_CROSS)_LINK)_TCC = yes
-YES_THINGY=$($(WIN64_CROSS)_LINK)_TCC
-endif
-endif
-
-ifeq ($(TARGETOS),Linux)
-ifeq ($(ARCH),i386)
-PROGS:=$($(I386_CROSS)_LINK) $(PROGS)
-$($(I386_CROSS)_LINK)_TCC = yes
-endif
-ifeq ($(ARCH),x86-64)
-PROGS:=$($(X64_CROSS)_LINK) $(PROGS)
-$($(X64_CROSS)_LINK)_TCC = yes
-endif
-endif
-
 CORE_FILES = tcc.c libtcc.c tccpp.c tccgen.c tccelf.c tccasm.c tccrun.c
 CORE_FILES += tcc.h config.h libtcc.h tcctok.h
 I386_FILES = $(CORE_FILES) i386-gen.c i386-asm.c i386-asm.h i386-tok.h
