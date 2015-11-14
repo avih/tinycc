@@ -244,11 +244,7 @@ static inline void write64le(unsigned char *p, uint64_t x)
 # define CONFIG_TCCDIR "."
 #endif
 #ifndef CONFIG_LDDIR
-# ifdef TCC_TARGET_X86_64
-#   define CONFIG_LDDIR "lib64"
-# else
-#   define CONFIG_LDDIR "lib"
-# endif
+# define CONFIG_LDDIR "lib"
 #endif
 
 #ifdef CONFIG_MULTIARCHDIR
