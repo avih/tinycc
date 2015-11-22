@@ -2,6 +2,13 @@
 @rem batch file to build tcc using mingw gcc
 @rem ----------------------------------------------------
 
+@rem optional variables:
+@rem   TCCSTATIC - (default not defined) if defined e.g. to 1, will create static tcc and libtcc
+@rem   CC - (default 'gcc') - C compiler. setting this to a tcc executable works fine.
+@rem   WINTCCFLAGS - compiler flags, defaults to gcc flags, but tcc won't complain.
+
+pushd %~dp0
+
 @set /p VERSION= < ..\VERSION
 echo>..\config.h #define TCC_VERSION "%VERSION%"
 
@@ -9,14 +16,18 @@ echo>..\config.h #define TCC_VERSION "%VERSION%"
 @if _%PROCESSOR_ARCHITECTURE%_==_AMD64_ goto x86_64
 
 @set target=-DTCC_TARGET_PE -DTCC_TARGET_I386
-@set CC=gcc -Os -s -fno-strict-aliasing
+@if not defined WINTCCFLAGS (@set WINTCCFLAGS=-Os -s -fno-strict-aliasing)
+@if not defined CC (@set CC=gcc)
+@set CC=%CC% %WINTCCFLAGS%
 @set P=32
 @goto tools
 
 :x86_64
 @set target=-DTCC_TARGET_PE -DTCC_TARGET_X86_64
 @rem mingw 64 has an ICE with -Os
-@set CC=x86_64-pc-mingw32-gcc -O0 -s -fno-strict-aliasing
+@if not defined WINTCCFLAGS (@set WINTCCFLAGS=-O0 -s -fno-strict-aliasing)
+@if not defined CC (@set CC=x86_64-pc-mingw32-gcc)
+@set CC=%CC% %WINTCCFLAGS%
 @set P=64
 @goto tools
 
@@ -27,8 +38,17 @@ echo>..\config.h #define TCC_VERSION "%VERSION%"
 :libtcc
 if not exist libtcc mkdir libtcc
 copy ..\libtcc.h libtcc\libtcc.h
-%CC% %target% -shared -DLIBTCC_AS_DLL -DONE_SOURCE ../libtcc.c -o libtcc.dll -Wl,-out-implib,libtcc/libtcc.a
-tiny_impdef libtcc.dll -o libtcc/libtcc.def
+copy ..\tcclib.h include\tcclib.h
+if not defined TCCSTATIC (
+  @rem Fine with CC as tcc, but with gcc from MSYS2, the resulting tcc needs libgcc_s_dw2-1.dll - usable in MSYS2
+  %CC% %target% -shared -DLIBTCC_AS_DLL -DONE_SOURCE ../libtcc.c -o libtcc.dll -Wl,-out-implib,libtcc/libtcc.a
+  tiny_impdef libtcc.dll -o libtcc/libtcc.def
+  @if exist libtcc.def del libtcc.def
+) else (
+  @rem Currently this works only with CC as tcc
+  %CC% %target% -c -DONE_SOURCE ../libtcc.c -o libtcc/libtcc.a
+  @rem ar rcs libtcc/libtcc.a libtcc/libtcc.o
+)
 
 :tcc
 %CC% %target% ../tcc.c -o tcc.exe -ltcc -Llibtcc
