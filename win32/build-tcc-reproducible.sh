@@ -75,6 +75,10 @@ $CC $CFLAGS $TCC_FLAGS $PLAT_TARGET $SRCDIR/tcc.c -o $TARGET_DIR/tcc.exe
 $CC $CFLAGS            $PLAT_TARGET $SRCDIR/$TLM  -o $TARGET_DIR/tiny_libmaker.exe
 $CC $CFLAGS            $PLAT_TARGET $SRCDIR/$TID  -o $TARGET_DIR/tiny_impdef.exe
 
+# build dummy libm (an empty string also works, but just looks weird)
+echo "void _tcc_dummy_libm(){}" | $CC -c - -o $BLD_DIR/libm.o
+$AR rcs $TARGET_DIR/lib/libm.a $BLD_DIR/libm.o
+
 mv $TARGET_DIR/tmp* $BLD_DIR/
 
 # remove out tmp objects. but for debugging leave it.
