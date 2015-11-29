@@ -1,15 +1,15 @@
-#include <unistd.h>
+//TCC: #include <unistd.h>
 #include <wchar.h>
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
-#include "libc.h"
+//TCC: #include "libc.h"
 
 char *optarg;
 int optind=1, opterr=1, optopt, __optpos, __optreset=0;
 
 #define optpos __optpos
-weak_alias(__optreset, optreset);
+//TCC: weak_alias(__optreset, optreset);
 
 int getopt(int argc, char * const argv[], const char *optstring)
 {
@@ -71,4 +71,4 @@ int getopt(int argc, char * const argv[], const char *optstring)
 	return c;
 }
 
-weak_alias(getopt, __posix_getopt);
+//TCC: weak_alias(getopt, __posix_getopt);
