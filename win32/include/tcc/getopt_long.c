@@ -1,4 +1,4 @@
-#define _GNU_SOURCE
+//TCC: #define _GNU_SOURCE
 #include <stddef.h>
 #include <getopt.h>
 #include <stdio.h>
