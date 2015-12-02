@@ -273,7 +273,7 @@ static inline void write64le(unsigned char *p, uint64_t x)
 /* system include paths */
 #ifndef CONFIG_TCC_SYSINCLUDEPATHS
 # ifdef TCC_TARGET_PE
-#  define CONFIG_TCC_SYSINCLUDEPATHS "{B}/include;{B}/include/winapi"
+#  define CONFIG_TCC_SYSINCLUDEPATHS "{B}/local/include;{B}/include;{B}/include/winapi"
 # else
 #  define CONFIG_TCC_SYSINCLUDEPATHS \
         "{B}/include" \
@@ -285,7 +285,7 @@ static inline void write64le(unsigned char *p, uint64_t x)
 /* library search paths */
 #ifndef CONFIG_TCC_LIBPATHS
 # ifdef TCC_TARGET_PE
-#  define CONFIG_TCC_LIBPATHS "{B}/lib"
+#  define CONFIG_TCC_LIBPATHS "{B}/local/lib;{B}/lib"
 # else
 #  define CONFIG_TCC_LIBPATHS \
         ALSO_MUADIR(CONFIG_SYSROOT "/usr/" CONFIG_LDDIR) \
