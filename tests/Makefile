@@ -72,11 +72,7 @@ DISAS = objdump -d
 
 # libtcc test
 ifdef LIBTCC1
- ifdef CONFIG_WIN32
-    LIBTCC1:=$(TOP)/win32/libtcc/libtcc.a
- else
-    LIBTCC1:=$(TOP)/$(LIBTCC1)
- endif
+ LIBTCC1:=$(TOP)/$(LIBTCC1)
 endif
 
 all test : $(TESTS)
