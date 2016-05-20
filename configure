@@ -599,9 +599,22 @@ rm -f $TMPN* $CONFTEST
 # ---------------------------------------------------------------------------
 # build tree in object directory if source path is different from current one
 
+# dir must already exist or be create-able
+real_dir() {
+  local NEEDS_RM=""
+  if ! [ -e "$1" ]; then
+    mkdir "$1" || return 1
+    NEEDS_RM="yes"
+  elif ! [ -d "$1" ]; then
+    return 1
+  fi
+  echo "$(cd "$1" && pwd)"
+  [ -z "$NEEDS_RM" ] || rmdir "$1"
+}
+
 fn_makelink()
 {
-    SRCDIR=$(realpath $1)
+    SRCDIR="$(realpath "$1" 2>/dev/null || real_dir "$1")"
     DIR=$(dirname $2)
     FILE=$(basename $2)
     if test ! -d "$DIR"; then
@@ -611,7 +624,7 @@ fn_makelink()
 }
 
 if test "$source_path_used" = "yes" ; then
-  FILES="Makefile lib/Makefile tests/Makefile tests/tests2/* tests/pp/* tests/exsymtab/*"
+  FILES="Makefile lib/Makefile tests/Makefile tests/tests2/* tests/pp/*"
   for f in $FILES ; do
     fn_makelink $source_path $f
   done
