@@ -3,8 +3,13 @@
 TMP_SUFFIX="_tcc_reprobuild.tmp"
 BOOTSTRAP_SUFFIX="_bootstrap.tmp"
 
+if pushd . 2>/dev/null; then popd; else  # pushd/popd polyfill
+  pushd() { local p="$PWD"; cd "$1" && _pushDS="$p;$_pushDS"; }
+  popd() { cd "$(echo "$_pushDS" | cut -d ';' -f1)"; _pushDS="$(echo "$_pushDS" | cut -d ';' -f2- )"; }
+fi
+
 is_dir_empty() {
-  [ -z "$(ls -1qA "$1")" ]
+  [ -z "$(ls -1A "$1")" ]
 }
 
 # dir must already exist or be create-able
@@ -125,7 +130,7 @@ full_build() {
     fi
 
     echo "Removing '$TARGET_DIR'"
-    rm -rf "$TARGET_DIR" || echo "Cannot remove '$TARGET_DIR'. Aborting." && return 1
+    rm -rf "$TARGET_DIR" || (echo "Cannot remove '$TARGET_DIR'. Aborting."; return 1)
   fi
 
   echo "Creating '$TARGET_DIR'"
