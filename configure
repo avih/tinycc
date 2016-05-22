@@ -599,35 +599,15 @@ rm -f $TMPN* $CONFTEST
 # ---------------------------------------------------------------------------
 # build tree in object directory if source path is different from current one
 
-# dir must already exist or be create-able
-real_dir() {
-  local NEEDS_RM=""
-  if ! [ -e "$1" ]; then
-    mkdir "$1" || return 1
-    NEEDS_RM="yes"
-  elif ! [ -d "$1" ]; then
-    return 1
-  fi
-  echo "$(cd "$1" && pwd)"
-  [ -z "$NEEDS_RM" ] || rmdir "$1"
-}
-
-fn_makelink()
-{
-    SRCDIR="$(realpath "$1" 2>/dev/null || real_dir "$1")"
-    DIR=$(dirname $2)
-    FILE=$(basename $2)
-    if test ! -d "$DIR"; then
-        mkdir -p "$DIR"
-    fi
-    ln -s $SRCDIR/$DIR/$FILE $DIR/
-}
-
 if test "$source_path_used" = "yes" ; then
-  FILES="Makefile lib/Makefile tests/Makefile tests/tests2/* tests/pp/*"
-  for f in $FILES ; do
-    fn_makelink $source_path $f
-  done
+  # We could ln -s, but then it would fail if already exist. copy is good enough
+  # as we don't need that many files from the source dir at the build dir. KISS.
+  [ -d lib ] || mkdir lib
+  cp $source_path/lib/Makefile lib/
+  cp $source_path/Makefile ./
+
+  # the tests makefiles don't yet handle external build dir, so bring 'em over.
+  cp -rf $source_path/tests ./
 fi
 
 # ---------------------------------------------------------------------------
